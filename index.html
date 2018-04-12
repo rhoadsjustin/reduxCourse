@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Todos/Goals</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.min.js"></script>
 </head>
 <body>
     <div>
@@ -23,47 +24,7 @@
         function generateId() {
                 return Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
             }
-        //library code
-            function createStore(reducer) {
-                // the store has four parts
-
-                //1. the state
-                let state
-                let listeners = []
-                //2. get the state
-                const getState = () => state
-
-                //3. way to listen to changes on the state
-                const subscribe = (listener) => {
-                    listeners.push(listener)
-                    return () => {
-                        listeners = listeners.filter((l) => l !== listener)
-                    }
-                }
-
-                const dispatch = (action) => {
-                    // call todos
-                    state = reducer(state, action)
-                    // loop over listeners and invoke them
-                    listeners.forEach((listener) => listener())
-                }
-
-
-                //4. way to update the state
-                return {
-                    getState,
-                    subscribe,
-                    dispatch
-                }
-            }
-
-
-            /*
-            Pure Functions
-            1) they always return the same result if the same arguments are passed in
-            2) they depend only on the arguments passed into them.
-            3) they should never produce any side effects
-            */
+       
             // App Code
             // Constants
             const ADD_TODO = 'ADD_TODO'
@@ -139,14 +100,10 @@
                 }
             }
 
-            function app(state = {}, action) {
-                return {
-                    todos: todos(state.todos, action),
-                    goals: goals(state.goals, action)
-                }
-            }
-
-            const store = createStore(app)
+            const store = Redux.createStore(Redux.combineReducers({
+                todos,
+                goals,
+            }))
 
             store.subscribe(() => {
                 const { todos, goals } = store.getState();
