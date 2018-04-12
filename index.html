@@ -24,7 +24,7 @@
                 return Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
             }
         //library code
-            function createStore() {
+            function createStore(reducer) {
                 // the store has four parts
 
                 //1. the state
@@ -43,7 +43,7 @@
 
                 const dispatch = (action) => {
                     // call todos
-                    state = todos(state, action)
+                    state = reducer(state, action)
                     // loop over listeners and invoke them
                     listeners.forEach((listener) => listener())
                 }
@@ -146,14 +146,20 @@
                 }
             }
 
-            const store = createStore()
+            const store = createStore(app)
 
             store.subscribe(() => {
-                const {goals, todos} = store.getState();
+                const { todos, goals } = store.getState();
 
-                console.log('goals', goals)
-                console.log('todos', todos)
+                document.getElementById('goals').innerHTML = ''
+                document.getElementById('todos').innerHTML = ''
+
+                goals.forEach(addGoalToDOM)
+                todos.forEach(addTodoToDOM)
+
             })
+
+
             // store.dispatch(AddTodoAction({
             //     id: 2,
             //     name: 'Learn Action Creators',
@@ -169,6 +175,45 @@
             //     }
             // })
     // DOM code
+
+    function createRemoveButton (onClick) {
+        const removeBtn = document.createElement('button')
+        removeBtn.innerHTML = 'X'
+        removeBtn.addEventListener('click', onClick)
+
+        return removeBtn 
+    }
+
+    function addTodoToDOM (todo) {
+                const node = document.createElement('li')
+                const text = document.createTextNode(todo.name)
+
+                const removeBtn = createRemoveButton(() => {
+                    store.dispatch(removeTodoAction(todo.id))
+                })
+                node.appendChild(text)
+                node.appendChild(removeBtn)
+
+                node.style.textDecoration = todo.complete ? 'line-through' : 'none'
+                node.addEventListener('click', () => {
+                    store.dispatch(toggleTodoAction(todo.id))
+                })
+                document.getElementById('todos')
+                  .appendChild(node)
+    }
+
+    function addGoalToDOM (goal) {
+        const node = document.createElement('li')
+        const text = document.createTextNode(goal.name)
+        const removeBtn = createRemoveButton(() => {
+                    store.dispatch(removeGoalAction(goal.id))
+                })
+        node.appendChild(text)
+        node.appendChild(removeBtn)
+
+        document.getElementById('goals')
+            .appendChild(node)
+    }
     function addTodo(){
         const input = document.getElementById('todo')
         const name = input.value
