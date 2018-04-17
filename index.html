@@ -43,14 +43,7 @@
             const REMOVE_GOAL = 'REMOVE_GOAL'
 
             //Action Creators
-            function AddTodoAction(todo) {
-                return {
-                    type: ADD_TODO,
-                    todo
-                }
-            }
-
-            function AddTodoAction(todo) {
+            function addTodoAction(todo) {
                 return {
                     type: ADD_TODO,
                     todo
@@ -99,7 +92,6 @@
                         ) {
                             return alert('Nope. Bad Idea')
                         }
-                        return store.dispatch(action)
                         return next(action)
                     }
             // log to console action and action being dispatched and state
@@ -227,17 +219,34 @@
     <script type="text/babel">
         function List (props) {
             return (
-                <ul>
-                <li>LIST</li>
+                    <ul>
+                        <li>LIST</li>
                     </ul>
             )
         }
 
         class Todos extends React.Component {
+            addItem = (e) => {
+                e.preventDefault()
+                const name = this.input.value
+                this.input.value = ''
+
+                this.props.store.dispatch(addTodoAction({
+                    id: generateId(),
+                    name,
+                    complete: false,
+                }))
+            }
             render () {
                 return (
                     <div>
-                    TODOS 
+                    <h1>TODOS List</h1>
+                        <input
+                            type='text'
+                            placeholder='Add Todo'
+                            ref={(input) => this.input = input}
+                        />
+                        <button onClick={this.addItem}>Add Item</button>
                     <List />
                     </div>
                 )
@@ -258,14 +267,14 @@
                 return (
                     <div>
                     React App
-                    <Todos />
+                    <Todos store={this.props.store}/>
                     <Goals />
                     </div>
                 )
             }
         }
     ReactDOM.render(
-        <App />,
+        <App store={store}/>,
         document.getElementById('app')
     )
     </script>
